@@ -1,13 +1,18 @@
+using Ambition.Domain;
+using Ambition.Infrastructure.Data;
+using Ambition.UI;
+
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAmbitionDbContext(builder.Configuration, builder.Environment);
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -16,29 +21,36 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/maintenance-plan/{id:guid}", async ([FromRoute] Guid id, IMaintenancePlanRepository repository) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var plan = await repository.GetByIdAsync(id);
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
+    return plan is null
+        ? Results.NotFound()
+        : Results.Ok(plan);
 })
-.WithName("GetWeatherForecast")
+.WithName("Get")
+.WithOpenApi();
+
+app.MapPost("/maintenance-plan", async ([FromBody] CreatePlanModel model, IMaintenancePlanRepository repository) =>
+{
+    var plan = new MaintenancePlan
+    {
+        Id = Guid.NewGuid(),
+        Description = model.Description,
+        CustomerId = model.CustomerId,
+        ProductId = model.ProductId,
+        EffectiveOn = model.EffectiveOn,
+        CreatedBy = model.UserName,
+        CreatedAt = DateTime.UtcNow
+    };
+
+    await repository.AddAsync(plan);
+
+    return Results.Created($"/maintenance-plan/{plan.Id}", model);
+})
+.WithName("Create")
 .WithOpenApi();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
