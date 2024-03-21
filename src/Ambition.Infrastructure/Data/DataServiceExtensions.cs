@@ -1,14 +1,14 @@
 ﻿using Ambition.Domain;
+using Ambition.Infrastructure.Data;
 using Ambition.Infrastructure.Data.MaintenancePlans;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Ambition.Infrastructure.Data;
+namespace Microsoft.Extensions.DependencyInjection;
 
-public static class ServiceExtensions
+public static class DataServiceExtensions
 {
     public static IServiceCollection AddAmbitionDbContext(
         this IServiceCollection services,

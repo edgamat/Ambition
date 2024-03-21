@@ -1,5 +1,4 @@
 using Ambition.Domain;
-using Ambition.Infrastructure.Data;
 using Ambition.UI;
 
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAmbitionDbContext(builder.Configuration, builder.Environment);
+builder.Services.AddMessaging(builder.Configuration, builder.Environment);
+builder.Services.AddScoped<IMaintenancePlanService, MaintenancePlanService>();
 
 var app = builder.Build();
 
@@ -32,7 +33,7 @@ app.MapGet("/maintenance-plan/{id:guid}", async ([FromRoute] Guid id, IMaintenan
 .WithName("Get")
 .WithOpenApi();
 
-app.MapPost("/maintenance-plan", async ([FromBody] CreatePlanModel model, IMaintenancePlanRepository repository) =>
+app.MapPost("/maintenance-plan", async ([FromBody] CreatePlanModel model, IMaintenancePlanService maintenancePlanService) =>
 {
     var plan = new MaintenancePlan
     {
@@ -45,7 +46,7 @@ app.MapPost("/maintenance-plan", async ([FromBody] CreatePlanModel model, IMaint
         CreatedAt = DateTime.UtcNow
     };
 
-    await repository.AddAsync(plan);
+    await maintenancePlanService.CreateAsync(plan);
 
     return Results.Created($"/maintenance-plan/{plan.Id}", model);
 })
