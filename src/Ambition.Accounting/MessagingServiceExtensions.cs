@@ -1,10 +1,10 @@
-﻿using Ambition.Accounting;
+﻿using Ambition.Accounting.Messages;
 
 using MassTransit;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class EventServiceExtensions
+public static class MessagingServiceExtensions
 {
     public static IServiceCollection AddMessaging(
         this IServiceCollection services,

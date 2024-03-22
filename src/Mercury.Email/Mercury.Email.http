@@ -1,0 +1,6 @@
+@Mercury.Email_HostAddress = http://localhost:5126
+
+GET {{Mercury.Email_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

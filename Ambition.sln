@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.Infrastructure", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.Accounting", "src\Ambition.Accounting\Ambition.Accounting.csproj", "{E552D2D2-1202-444A-AA4F-95A49A95796E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercury.Email", "src\Mercury.Email\Mercury.Email.csproj", "{4FCB6BAA-8685-4BD0-92B8-50B33E5D7B97}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{E552D2D2-1202-444A-AA4F-95A49A95796E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E552D2D2-1202-444A-AA4F-95A49A95796E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E552D2D2-1202-444A-AA4F-95A49A95796E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FCB6BAA-8685-4BD0-92B8-50B33E5D7B97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FCB6BAA-8685-4BD0-92B8-50B33E5D7B97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FCB6BAA-8685-4BD0-92B8-50B33E5D7B97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FCB6BAA-8685-4BD0-92B8-50B33E5D7B97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{A4B24562-6827-415E-9518-DFF4157714F2} = {96BF5630-FB7C-479F-9666-7EAE81CAEF76}
 		{03D167E0-6D0E-4516-94D1-52AC94C7439A} = {FDABAB7C-D198-4702-B4E1-B594AFDB8886}
 		{E552D2D2-1202-444A-AA4F-95A49A95796E} = {FDABAB7C-D198-4702-B4E1-B594AFDB8886}
+		{4FCB6BAA-8685-4BD0-92B8-50B33E5D7B97} = {FDABAB7C-D198-4702-B4E1-B594AFDB8886}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {87D4D1C9-D1B5-42A9-99C3-367F98E63BE0}
