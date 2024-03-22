@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Ambition.UI", "te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.Infrastructure", "src\Ambition.Infrastructure\Ambition.Infrastructure.csproj", "{03D167E0-6D0E-4516-94D1-52AC94C7439A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ambition.Accounting", "src\Ambition.Accounting\Ambition.Accounting.csproj", "{E552D2D2-1202-444A-AA4F-95A49A95796E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.Accounting", "src\Ambition.Accounting\Ambition.Accounting.csproj", "{E552D2D2-1202-444A-AA4F-95A49A95796E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
