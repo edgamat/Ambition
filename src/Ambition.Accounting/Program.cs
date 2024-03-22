@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 
+builder.ConfigureOpenTelemetry();
+
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 
 builder.Services.AddHostedService<Worker>();

@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.Infrastructure", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.Accounting", "src\Ambition.Accounting\Ambition.Accounting.csproj", "{E552D2D2-1202-444A-AA4F-95A49A95796E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercury.Email", "src\Mercury.Email\Mercury.Email.csproj", "{4FCB6BAA-8685-4BD0-92B8-50B33E5D7B97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mercury.Email", "src\Mercury.Email\Mercury.Email.csproj", "{4FCB6BAA-8685-4BD0-92B8-50B33E5D7B97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
