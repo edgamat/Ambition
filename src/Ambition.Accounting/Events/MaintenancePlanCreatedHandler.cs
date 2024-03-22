@@ -1,4 +1,6 @@
-﻿using Ambition.Accounting.Data;
+﻿using Ambition.Accounting.Customers;
+using Ambition.Accounting.Data;
+using Ambition.Accounting.Emails;
 using Ambition.Accounting.Invoices;
 
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +11,16 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
 {
     private readonly ILogger<MaintenancePlanCreatedHandler> _logger;
     private readonly AccountingDbContext _dbContext;
+    private readonly IEmailService _emailService;
 
     public MaintenancePlanCreatedHandler(
         ILogger<MaintenancePlanCreatedHandler> logger,
-        AccountingDbContext dbContext)
+        AccountingDbContext dbContext,
+        IEmailService emailService)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _emailService = emailService;
     }
 
     public async Task HandleAsync(MaintenancePlanCreatedEvent @event)
@@ -46,5 +51,18 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
         await _dbContext.SaveChangesAsync();
 
         _logger.LogInformation("Invoice {InvoiceID} created for maintenance plan: {Id}", invoiceId, @event.Id);
+
+        var customer = await _dbContext.Set<Customer>().FindAsync(@event.CustomerId);
+        if (customer == null)
+        {
+            _logger.LogWarning("Customer {CustomerId} not found for maintenance plan: {Id}", @event.CustomerId, @event.Id);
+            return;
+        }
+
+        var email = customer.Email;
+        var subject = "Invoice for Maintenance Plan";
+        var body = $"Dear {customer.Name},\n\nAn invoice has been generated for your maintenance plan. Please find the details below:\n\nInvoice Number: {invoice.Number}\nAmount: {invoice.Amount:C}\nDue Date: {invoice.DueOn:dd-MMM-yyyy}\n\nThank you for choosing our services.\n\nRegards,\nAmbition Accounting Team";
+
+        await _emailService.SendEmailAsync(email, subject, body);
     }
 }

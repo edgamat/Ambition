@@ -1,10 +1,13 @@
 using Ambition.Accounting;
 using Ambition.Accounting.Data;
+using Ambition.Accounting.Emails;
 using Ambition.Accounting.Events;
 
 using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.Services.AddHttpClient<IEmailService, EmailService>();
 
 builder.Services.AddHostedService<Worker>();
 
