@@ -1,4 +1,6 @@
-﻿using Ambition.Accounting.Customers;
+﻿using System.Diagnostics;
+
+using Ambition.Accounting.Customers;
 using Ambition.Accounting.Data;
 using Ambition.Accounting.Emails;
 using Ambition.Accounting.Invoices;
@@ -35,6 +37,7 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
         }
 
         var invoiceId = Guid.NewGuid();
+
         invoice = new Invoice
         {
             Id = invoiceId,
@@ -45,6 +48,10 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
             MaintenancePlanId = @event.Id,
             CustomerId = @event.CustomerId
         };
+
+        Activity.Current?.SetTag("invoice.id", invoiceId);
+        Activity.Current?.SetTag("invoice.number", invoice.Number);
+        Activity.Current?.SetTag("invoice.customer-id", invoice.CustomerId);
 
         _dbContext.Set<Invoice>().Add(invoice);
 

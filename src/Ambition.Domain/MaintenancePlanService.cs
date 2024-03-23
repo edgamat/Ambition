@@ -1,4 +1,6 @@
-﻿namespace Ambition.Domain;
+﻿using System.Diagnostics;
+
+namespace Ambition.Domain;
 
 public class MaintenancePlanService : IMaintenancePlanService
 {
@@ -14,6 +16,10 @@ public class MaintenancePlanService : IMaintenancePlanService
 
     public async Task<Guid> CreateAsync(MaintenancePlan maintenancePlan)
     {
+        Activity.Current?.SetTag("maintenance-plan.id", maintenancePlan.Id);
+        Activity.Current?.SetTag("maintenance-plan.product-id", maintenancePlan.ProductId);
+        Activity.Current?.SetTag("maintenance-plan.customer-id", maintenancePlan.CustomerId);
+
         await _repository.AddAsync(maintenancePlan);
 
         var maintenancePlanCreated = new MaintenancePlanCreated(
