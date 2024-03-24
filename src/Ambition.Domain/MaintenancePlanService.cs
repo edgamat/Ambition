@@ -20,6 +20,11 @@ public class MaintenancePlanService : IMaintenancePlanService
         Activity.Current?.SetTag("maintenance-plan.product-id", maintenancePlan.ProductId);
         Activity.Current?.SetTag("maintenance-plan.customer-id", maintenancePlan.CustomerId);
 
+        if (maintenancePlan.Id == Guid.Empty)
+        {
+            throw new InvalidOperationException("Maintenance plan ID is empty.");
+        }
+
         await _repository.AddAsync(maintenancePlan);
 
         var maintenancePlanCreated = new MaintenancePlanCreated(

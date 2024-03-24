@@ -16,7 +16,23 @@ builder.Services.AddAmbitionDbContext(builder.Configuration, builder.Environment
 builder.Services.AddMessaging(builder.Configuration, builder.Environment);
 builder.Services.AddScoped<IMaintenancePlanService, MaintenancePlanService>();
 
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = (context) =>
+    {
+        var traceId = Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
+        if (traceId != null)
+        {
+            context.ProblemDetails.Extensions["traceId"] = traceId;
+            context.ProblemDetails.Detail = "An error occurred in our API. Use the trace id when contacting us.";
+        }
+    };
+});
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {

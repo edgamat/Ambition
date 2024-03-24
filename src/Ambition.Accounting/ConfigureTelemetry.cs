@@ -18,12 +18,13 @@ public static class ConfigureTelemetry
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resourceBuilder =>
             {
-                resourceBuilder.AddService(builder.Environment.ApplicationName, serviceVersion: GetAssemblyVersion());
-                resourceBuilder.AddAttributes(new Dictionary<string, object>
-                {
-                    ["deployment.environment"] = builder.Environment.EnvironmentName,
-                    ["deployment.machine"] = Environment.MachineName,
-                });
+                resourceBuilder.AddService(builder.Environment.ApplicationName);
+                //resourceBuilder.AddService(builder.Environment.ApplicationName, serviceVersion: GetAssemblyVersion());
+                //resourceBuilder.AddAttributes(new Dictionary<string, object>
+                //{
+                //    ["deployment.environment"] = builder.Environment.EnvironmentName,
+                //    ["deployment.machine"] = Environment.MachineName,
+                //});
             });
 
         // Logging
@@ -32,6 +33,7 @@ public static class ConfigureTelemetry
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
 
+            logging.AddConsoleExporter();
             logging.AddOtlpExporter(configure =>
             {
                 configure.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/logs");
@@ -47,7 +49,7 @@ public static class ConfigureTelemetry
                 if (builder.Environment.IsDevelopment())
                 {
                     // We want to view all traces in development
-                    tracing.SetSampler(new AlwaysOnSampler());
+                    tracing.SetSampler<AlwaysOnSampler>();
                 }
 
                 tracing.AddSource(DiagnosticHeaders.DefaultListenerName);
@@ -59,6 +61,7 @@ public static class ConfigureTelemetry
                         options.SetDbStatementForStoredProcedure = true;
                     });
 
+                tracing.AddConsoleExporter();
                 tracing.AddOtlpExporter(exporter =>
                 {
                     exporter.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/traces");
