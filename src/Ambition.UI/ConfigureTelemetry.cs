@@ -16,16 +16,14 @@ public static class ConfigureTelemetry
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resourceBuilder =>
             {
-                resourceBuilder.AddService(builder.Environment.ApplicationName);
-
-                //resourceBuilder.AddService(
-                //    serviceName: builder.Environment.ApplicationName,
-                //    serviceVersion: GetAssemblyVersion(),
-                //    serviceInstanceId: Environment.MachineName);
-                //resourceBuilder.AddAttributes(new Dictionary<string, object>
-                //{
-                //    ["deployment.environment"] = builder.Environment.EnvironmentName
-                //});
+                resourceBuilder.AddService(
+                    serviceName: builder.Environment.ApplicationName,
+                    serviceVersion: GetAssemblyVersion(),
+                    serviceInstanceId: Environment.MachineName);
+                resourceBuilder.AddAttributes(new Dictionary<string, object>
+                {
+                    ["deployment.environment"] = builder.Environment.EnvironmentName
+                });
             });
 
         // Logging

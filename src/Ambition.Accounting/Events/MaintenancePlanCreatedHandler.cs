@@ -29,6 +29,11 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
     {
         _logger.LogInformation("Handling MaintenancePlanCreated event for maintenance plan: {Id}", @event.Id);
 
+        Activity.Current?.SetTag("maintenance-plan.id", @event.Id);
+        Activity.Current?.SetTag("costumer_id", @event.CustomerId);
+        Activity.Current?.SetTag("product_id", @event.ProductId);
+        Activity.Current?.SetTag("user.name", @event.CreatedBy);
+
         var invoice = await _dbContext.Set<Invoice>().FirstOrDefaultAsync(i => i.MaintenancePlanId == @event.Id);
         if (invoice != null)
         {

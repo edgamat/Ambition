@@ -1,4 +1,6 @@
-﻿using Ambition.Accounting.Events;
+﻿using System.Diagnostics;
+
+using Ambition.Accounting.Events;
 using Ambition.Domain;
 
 using MassTransit;
@@ -21,6 +23,14 @@ public class MaintenancePlanCreatedConsumer : IConsumer<MaintenancePlanCreated>
     public async Task Consume(ConsumeContext<MaintenancePlanCreated> context)
     {
         _logger.LogInformation("Received MaintenancePlanCreated message for maintenance plan: {Id}", context.Message.Id);
+
+        var source = Activity.Current?.Source;
+        _logger.LogInformation("Activity source: {Source}", source?.Name);
+
+        Activity.Current?.SetTag("maintenance-plan.id", context.Message.Id);
+        Activity.Current?.SetTag("costumer_id", context.Message.CustomerId);
+        Activity.Current?.SetTag("product_id", context.Message.ProductId);
+        Activity.Current?.SetTag("user.name", context.Message.CreatedBy);
 
         await _eventHandler.HandleAsync(new MaintenancePlanCreatedEvent
         {
