@@ -64,8 +64,6 @@ public static class ConfigureTelemetry
                         {
                             if (cmd is SqlCommand sqlCommand)
                                 activity.SetTag("db.parameter-count", sqlCommand.Parameters.Count);
-
-                            activity.SetTag("user.name", "test-user");
                         };
                     });
 

@@ -16,9 +16,9 @@ public class MaintenancePlanService : IMaintenancePlanService
 
     public async Task<Guid> CreateAsync(MaintenancePlan maintenancePlan)
     {
-        Activity.Current?.SetTag("maintenance-plan.id", maintenancePlan.Id);
-        Activity.Current?.SetTag("maintenance-plan.product-id", maintenancePlan.ProductId);
-        Activity.Current?.SetTag("maintenance-plan.customer-id", maintenancePlan.CustomerId);
+        Activity.Current?.SetTag(DiagnosticNames.MaintenancePlanId, maintenancePlan.Id);
+        Activity.Current?.SetTag(DiagnosticNames.MaintenancePlanProductId, maintenancePlan.ProductId);
+        Activity.Current?.SetTag(DiagnosticNames.MaintenancePlanCustomerId, maintenancePlan.CustomerId);
 
         if (maintenancePlan.Id == Guid.Empty)
         {

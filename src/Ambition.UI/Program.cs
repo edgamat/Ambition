@@ -55,8 +55,6 @@ app.MapGet("/maintenance-plan/{id:guid}", async ([FromRoute] Guid id, IMaintenan
 
 app.MapPost("/maintenance-plan", async ([FromBody] CreatePlanModel model, IMaintenancePlanService maintenancePlanService) =>
 {
-    Activity.Current?.SetTag("user.name", model.UserName);
-
     var plan = new MaintenancePlan
     {
         Id = Guid.NewGuid(),

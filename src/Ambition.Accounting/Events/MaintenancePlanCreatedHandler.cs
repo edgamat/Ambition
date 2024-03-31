@@ -29,11 +29,6 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
     {
         _logger.LogInformation("Handling MaintenancePlanCreated event for maintenance plan: {Id}", @event.Id);
 
-        Activity.Current?.SetTag("maintenance-plan.id", @event.Id);
-        Activity.Current?.SetTag("costumer_id", @event.CustomerId);
-        Activity.Current?.SetTag("product_id", @event.ProductId);
-        Activity.Current?.SetTag("user.name", @event.CreatedBy);
-
         var invoice = await _dbContext.Set<Invoice>().FirstOrDefaultAsync(i => i.MaintenancePlanId == @event.Id);
         if (invoice != null)
         {
@@ -54,9 +49,9 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
             CustomerId = @event.CustomerId
         };
 
-        Activity.Current?.SetTag("invoice.id", invoiceId);
-        Activity.Current?.SetTag("invoice.number", invoice.Number);
-        Activity.Current?.SetTag("invoice.customer-id", invoice.CustomerId);
+        Activity.Current?.SetTag(DiagnosticNames.InvoiceId, invoiceId);
+        Activity.Current?.SetTag(DiagnosticNames.InvoiceNumber, invoice.Number);
+        Activity.Current?.SetTag(DiagnosticNames.InvoiceCustomerId, invoice.CustomerId);
 
         _dbContext.Set<Invoice>().Add(invoice);
 
@@ -76,5 +71,11 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
         var body = $"Dear {customer.Name},\n\nAn invoice has been generated for your maintenance plan. Please find the details below:\n\nInvoice Number: {invoice.Number}\nAmount: {invoice.Amount:C}\nDue Date: {invoice.DueOn:dd-MMM-yyyy}\n\nThank you for choosing our services.\n\nRegards,\nAmbition Accounting Team";
 
         await _emailService.SendEmailAsync(email, subject, body);
+
+        var eventTags = new Dictionary<string, object?>
+        {
+            { DiagnosticNames.InvoiceId, invoiceId }
+        };
+        Activity.Current?.AddEvent(new ActivityEvent(DiagnosticNames.InvoiceSentEvent, tags: new(eventTags)));
     }
 }
