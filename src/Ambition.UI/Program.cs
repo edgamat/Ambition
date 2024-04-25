@@ -21,7 +21,7 @@ builder.Services.AddProblemDetails(options =>
     options.CustomizeProblemDetails = (context) =>
     {
         var traceId = Activity.Current?.Id ?? context.HttpContext.TraceIdentifier;
-        if (traceId != null)
+        if (!string.IsNullOrWhiteSpace(traceId))
         {
             context.ProblemDetails.Extensions["traceId"] = traceId;
             context.ProblemDetails.Detail = "An error occurred in our API. Use the trace id when contacting us.";
@@ -41,6 +41,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseTraceParent();
 
 app.MapGet("/maintenance-plan/{id:guid}", async ([FromRoute] Guid id, IMaintenancePlanRepository repository) =>
 {
