@@ -36,6 +36,6 @@ public class MaintenancePlanCreatedConsumer : IConsumer<MaintenancePlanCreated>
             CustomerId = context.Message.CustomerId,
             CreatedBy = context.Message.CreatedBy,
             CreatedAt = context.Message.CreatedAt
-        });
+        }, context.CancellationToken);
     }
 }

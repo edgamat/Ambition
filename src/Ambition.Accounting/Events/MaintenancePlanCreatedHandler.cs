@@ -25,7 +25,7 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
         _emailService = emailService;
     }
 
-    public async Task HandleAsync(MaintenancePlanCreatedEvent @event)
+    public async Task HandleAsync(MaintenancePlanCreatedEvent @event, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling MaintenancePlanCreated event for maintenance plan: {Id}", @event.Id);
 
@@ -55,11 +55,11 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
 
         _dbContext.Set<Invoice>().Add(invoice);
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Invoice {InvoiceID} created for maintenance plan: {Id}", invoiceId, @event.Id);
 
-        var customer = await _dbContext.Set<Customer>().FindAsync(@event.CustomerId);
+        var customer = await _dbContext.Set<Customer>().FindAsync(@event.CustomerId, cancellationToken);
         if (customer == null)
         {
             _logger.LogWarning("Customer {CustomerId} not found for maintenance plan: {Id}", @event.CustomerId, @event.Id);
@@ -70,7 +70,7 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
         var subject = "Invoice for Maintenance Plan";
         var body = $"Dear {customer.Name},\n\nAn invoice has been generated for your maintenance plan. Please find the details below:\n\nInvoice Number: {invoice.Number}\nAmount: {invoice.Amount:C}\nDue Date: {invoice.DueOn:dd-MMM-yyyy}\n\nThank you for choosing our services.\n\nRegards,\nAmbition Accounting Team";
 
-        await _emailService.SendEmailAsync(email, subject, body);
+        await _emailService.SendEmailAsync(email, subject, body, cancellationToken);
 
         var eventTags = new Dictionary<string, object?>
         {

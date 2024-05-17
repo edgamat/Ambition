@@ -2,5 +2,5 @@
 
 public interface IEventHandler<T>
 {
-    Task HandleAsync(T @event);
+    Task HandleAsync(T @event, CancellationToken cancellationToken);
 }

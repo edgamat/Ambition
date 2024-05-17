@@ -14,7 +14,7 @@ public class EmailService : IEmailService
         _logger = logger;
     }
 
-    public async Task SendEmailAsync(string email, string subject, string body)
+    public async Task SendEmailAsync(string email, string subject, string body, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Sending email to {Email} with subject {Subject}", email, subject);
 
@@ -25,7 +25,7 @@ public class EmailService : IEmailService
                 Encoding.UTF8,
                 "application/json");
 
-        using HttpResponseMessage response = await _httpClient.PostAsync("send", jsonContent);
+        using HttpResponseMessage response = await _httpClient.PostAsync("send", jsonContent, cancellationToken);
 
         response.EnsureSuccessStatusCode();
     }
