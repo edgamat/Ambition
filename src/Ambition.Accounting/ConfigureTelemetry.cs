@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+using Azure.Monitor.OpenTelemetry.Exporter;
+
 using Microsoft.Data.SqlClient;
 
 using OpenTelemetry.Exporter;
@@ -35,6 +37,15 @@ public static class ConfigureTelemetry
             logging.IncludeScopes = true;
 
             logging.AddConsoleExporter();
+            // logging.AddAzureMonitorLogExporter(o => o.ConnectionString = "InstrumentationKey=21852173-8ded-4414-ab32-3ec2dc7845b5;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=da5fcc28-11dd-434a-b816-7cdcb867c4d7");
+            var connectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
+            if (!string.IsNullOrWhiteSpace(connectionString))
+            {
+                logging.AddAzureMonitorLogExporter(o =>
+                {
+                    o.ConnectionString = connectionString;
+                });
+            }
             logging.AddOtlpExporter(configure =>
             {
                 configure.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/logs");
@@ -68,6 +79,7 @@ public static class ConfigureTelemetry
                     });
 
                 tracing.AddConsoleExporter();
+                tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = "InstrumentationKey=21852173-8ded-4414-ab32-3ec2dc7845b5;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=da5fcc28-11dd-434a-b816-7cdcb867c4d7");
                 tracing.AddOtlpExporter(exporter =>
                 {
                     exporter.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/traces");

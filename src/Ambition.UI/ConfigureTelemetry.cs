@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+using Azure.Monitor.OpenTelemetry.Exporter;
+
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -26,6 +28,8 @@ public static class ConfigureTelemetry
                 });
             });
 
+        var connectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
+
         // Logging
         builder.Logging.AddOpenTelemetry(logging =>
         {
@@ -33,6 +37,10 @@ public static class ConfigureTelemetry
             logging.IncludeScopes = true;
 
             logging.AddConsoleExporter();
+            if (!string.IsNullOrWhiteSpace(connectionString))
+            {
+                logging.AddAzureMonitorLogExporter(o => o.ConnectionString = connectionString);
+            }
             logging.AddOtlpExporter(configure =>
             {
                 configure.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/logs");
@@ -61,6 +69,11 @@ public static class ConfigureTelemetry
                     });
 
                 tracing.AddConsoleExporter();
+                if (!string.IsNullOrWhiteSpace(connectionString))
+                {
+                    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = connectionString);
+                }
+
                 tracing.AddOtlpExporter(exporter =>
                 {
                     exporter.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/traces");
