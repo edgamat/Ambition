@@ -1,4 +1,4 @@
-@Ambition.UI_HostAddress = http://localhost:5038
+@Ambition.UI_HostAddress = https://localhost:7289
 
 GET {{Ambition.UI_HostAddress}}/maintenance-plan/4db30db9-0fc1-4cf7-8b39-94f1ef719c70
 Accept: application/json

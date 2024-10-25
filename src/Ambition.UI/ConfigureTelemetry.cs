@@ -14,6 +14,8 @@ public static class ConfigureTelemetry
 {
     public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
     {
+        var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
+
         // Global settings
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resourceBuilder =>
@@ -24,11 +26,9 @@ public static class ConfigureTelemetry
                     serviceInstanceId: Environment.MachineName);
                 resourceBuilder.AddAttributes(new Dictionary<string, object>
                 {
-                    ["deployment.environment"] = builder.Environment.EnvironmentName
+                    ["deployment.environment.name"] = builder.Environment.EnvironmentName
                 });
             });
-
-        var connectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
 
         // Logging
         builder.Logging.AddOpenTelemetry(logging =>
@@ -37,9 +37,9 @@ public static class ConfigureTelemetry
             logging.IncludeScopes = true;
 
             logging.AddConsoleExporter();
-            if (!string.IsNullOrWhiteSpace(connectionString))
+            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
             {
-                logging.AddAzureMonitorLogExporter(o => o.ConnectionString = connectionString);
+                logging.AddAzureMonitorLogExporter(o => o.ConnectionString = appInsightsConnectionString);
             }
             logging.AddOtlpExporter(configure =>
             {
@@ -59,6 +59,8 @@ public static class ConfigureTelemetry
                     tracing.SetSampler<AlwaysOnSampler>();
                 }
 
+                tracing.AddSource(builder.Environment.ApplicationName);
+
                 tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
 
                 tracing.AddAspNetCoreInstrumentation()
@@ -69,9 +71,9 @@ public static class ConfigureTelemetry
                     });
 
                 tracing.AddConsoleExporter();
-                if (!string.IsNullOrWhiteSpace(connectionString))
+                if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
                 {
-                    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = connectionString);
+                    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = appInsightsConnectionString);
                 }
 
                 tracing.AddOtlpExporter(exporter =>

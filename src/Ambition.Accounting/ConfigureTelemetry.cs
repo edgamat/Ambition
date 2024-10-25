@@ -16,6 +16,8 @@ public static class ConfigureTelemetry
 {
     public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
     {
+        var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
+
         // Global settings
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resourceBuilder =>
@@ -26,7 +28,7 @@ public static class ConfigureTelemetry
                     serviceInstanceId: Environment.MachineName);
                 resourceBuilder.AddAttributes(new Dictionary<string, object>
                 {
-                    ["deployment.environment"] = builder.Environment.EnvironmentName
+                    ["deployment.environment.name"] = builder.Environment.EnvironmentName
                 });
             });
 
@@ -37,14 +39,10 @@ public static class ConfigureTelemetry
             logging.IncludeScopes = true;
 
             logging.AddConsoleExporter();
-            // logging.AddAzureMonitorLogExporter(o => o.ConnectionString = "InstrumentationKey=21852173-8ded-4414-ab32-3ec2dc7845b5;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=da5fcc28-11dd-434a-b816-7cdcb867c4d7");
-            var connectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
-            if (!string.IsNullOrWhiteSpace(connectionString))
+
+            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
             {
-                logging.AddAzureMonitorLogExporter(o =>
-                {
-                    o.ConnectionString = connectionString;
-                });
+                logging.AddAzureMonitorLogExporter(o => o.ConnectionString = appInsightsConnectionString);
             }
             logging.AddOtlpExporter(configure =>
             {
@@ -79,7 +77,10 @@ public static class ConfigureTelemetry
                     });
 
                 tracing.AddConsoleExporter();
-                tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = "InstrumentationKey=21852173-8ded-4414-ab32-3ec2dc7845b5;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=da5fcc28-11dd-434a-b816-7cdcb867c4d7");
+                if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+                {
+                    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = appInsightsConnectionString);
+                }
                 tracing.AddOtlpExporter(exporter =>
                 {
                     exporter.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/traces");
