@@ -1,14 +1,8 @@
 ﻿using System.Reflection;
 
-using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.ApplicationInsights.Extensibility;
 
-using Microsoft.Data.SqlClient;
-
-using OpenTelemetry.Exporter;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using Serilog;
 
 namespace Ambition.Accounting;
 
@@ -16,78 +10,23 @@ public static class ConfigureTelemetry
 {
     public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
     {
+        var loggerConfiguration = new LoggerConfiguration()
+            .Enrich.WithProperty("deployment.environment.name", builder.Environment.EnvironmentName)
+            .Enrich.WithProperty("service.name", builder.Environment.ApplicationName)
+            .Enrich.WithProperty("service.version", GetAssemblyVersion())
+            .WriteTo.Console()
+            .WriteTo.Seq("http://localhost:5341");
+
         var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
-
-        // Global settings
-        builder.Services.AddOpenTelemetry()
-            .ConfigureResource(resourceBuilder =>
-            {
-                resourceBuilder.AddService(
-                    serviceName: builder.Environment.ApplicationName,
-                    serviceVersion: GetAssemblyVersion(),
-                    serviceInstanceId: Environment.MachineName);
-                resourceBuilder.AddAttributes(new Dictionary<string, object>
-                {
-                    ["deployment.environment.name"] = builder.Environment.EnvironmentName
-                });
-            });
-
-        // Logging
-        builder.Logging.AddOpenTelemetry(logging =>
+        if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
         {
-            logging.IncludeFormattedMessage = true;
-            logging.IncludeScopes = true;
+            loggerConfiguration.WriteTo.ApplicationInsights(TelemetryConfiguration.CreateDefault(), TelemetryConverter.Traces);
+        }
 
-            logging.AddConsoleExporter();
+        Log.Logger = loggerConfiguration.CreateLogger();
 
-            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
-            {
-                logging.AddAzureMonitorLogExporter(o => o.ConnectionString = appInsightsConnectionString);
-            }
-            logging.AddOtlpExporter(configure =>
-            {
-                configure.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/logs");
-                configure.Protocol = OtlpExportProtocol.HttpProtobuf;
-                configure.Headers = "X-Seq-ApiKey=yrC3VeSr8KbSsT3MJeiD";
-            });
-        });
-
-        // Tracing
-        builder.Services.AddOpenTelemetry()
-            .WithTracing(tracing =>
-            {
-                if (builder.Environment.IsDevelopment())
-                {
-                    // We want to view all traces in development
-                    tracing.SetSampler<AlwaysOnSampler>();
-                }
-
-                tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
-
-                tracing.AddHttpClientInstrumentation()
-                    .AddSqlClientInstrumentation(options =>
-                    {
-                        options.SetDbStatementForText = true;
-                        options.SetDbStatementForStoredProcedure = true;
-                        options.Enrich = (activity, name, cmd) =>
-                        {
-                            if (cmd is SqlCommand sqlCommand)
-                                activity.SetTag("db.parameter-count", sqlCommand.Parameters.Count);
-                        };
-                    });
-
-                tracing.AddConsoleExporter();
-                if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
-                {
-                    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = appInsightsConnectionString);
-                }
-                tracing.AddOtlpExporter(exporter =>
-                {
-                    exporter.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/traces");
-                    exporter.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    exporter.Headers = "X-Seq-ApiKey=yrC3VeSr8KbSsT3MJeiD";
-                });
-            });
+        builder.Logging.ClearProviders();
+        builder.Logging.AddSerilog();
 
         return builder;
     }
