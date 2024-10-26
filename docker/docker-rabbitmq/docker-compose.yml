@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq-custom  # Using RabbitMQ image with management & shovel plugin.
+    ports:
+      - "5672:5672"  # AMQP protocol port.
+      - "15672:15672"  # Management UI port.
+#     command: ["rabbitmq-plugins", "enable", "rabbitmq_shovel", "rabbitmq_shovel_management"]  # Command to enable Shovel and its management plugin.
+    restart: unless-stopped
+    volumes:
+      - C:/DockerVolumes/rabbitmq/data:/var/lib/rabbitmq  # Maps RabbitMQ data directory
+      - C:/DockerVolumes/rabbitmq/logs:/var/log/rabbitmq  # Maps RabbitMQ logs directory

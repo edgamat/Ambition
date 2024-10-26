@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "P@ssw0rd"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - C:/DockerVolumes/mssql/data:/var/opt/mssql/data
+      - C:/DockerVolumes/mssql/log:/var/opt/mssql/log
+      - C:/DockerVolumes/mssql/secrets:/var/opt/mssql/secrets
+      - C:/DockerVolumes/mssql/backup:/var/opt/mssql/backup
+    ports:
+      - "1433:1433"
+    restart: unless-stopped
