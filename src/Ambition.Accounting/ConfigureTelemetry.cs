@@ -13,9 +13,18 @@ public static class ConfigureTelemetry
         var loggerConfiguration = new LoggerConfiguration()
             .Enrich.WithProperty("deployment.environment.name", builder.Environment.EnvironmentName)
             .Enrich.WithProperty("service.name", builder.Environment.ApplicationName)
-            .Enrich.WithProperty("service.version", GetAssemblyVersion())
-            .WriteTo.Console()
-            .WriteTo.Seq("http://localhost:5341");
+            .Enrich.WithProperty("service.version", GetAssemblyVersion());
+
+        if (builder.Environment.IsDevelopment())
+        {
+            loggerConfiguration.WriteTo.Console();
+        }
+
+        var seqServerUrl = builder.Configuration.GetValue<string>("SEQ_SERVER_URL");
+        if (!string.IsNullOrWhiteSpace(seqServerUrl))
+        {
+            loggerConfiguration.WriteTo.Seq(seqServerUrl);
+        }
 
         var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
         if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
