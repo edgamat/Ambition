@@ -49,9 +49,7 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
             CustomerId = @event.CustomerId
         };
 
-        Activity.Current?.SetTag(DiagnosticNames.InvoiceId, invoiceId);
-        Activity.Current?.SetTag(DiagnosticNames.InvoiceNumber, invoice.Number);
-        Activity.Current?.SetTag(DiagnosticNames.InvoiceCustomerId, invoice.CustomerId);
+        Activity.Current?.EnrichWithInvoice(invoice);
 
         _dbContext.Set<Invoice>().Add(invoice);
 
@@ -59,7 +57,7 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
 
         _logger.LogInformation("Invoice {InvoiceID} created for maintenance plan: {Id}", invoiceId, @event.Id);
 
-        var customer = await _dbContext.Set<Customer>().FindAsync(@event.CustomerId, cancellationToken);
+        var customer = await _dbContext.Set<Customer>().FindAsync([@event.CustomerId], cancellationToken: cancellationToken);
         if (customer == null)
         {
             _logger.LogWarning("Customer {CustomerId} not found for maintenance plan: {Id}", @event.CustomerId, @event.Id);

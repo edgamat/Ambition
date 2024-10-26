@@ -24,10 +24,7 @@ public class MaintenancePlanCreatedConsumer : IConsumer<MaintenancePlanCreated>
     {
         _logger.LogInformation("Received MaintenancePlanCreated message for maintenance plan: {Id}", context.Message.Id);
 
-        Activity.Current?.SetTag(DiagnosticNames.MaintenancePlanId, context.Message.Id);
-        Activity.Current?.SetTag(DiagnosticNames.MaintenancePlanCustomerId, context.Message.CustomerId);
-        Activity.Current?.SetTag(DiagnosticNames.MaintenancePlanProductId, context.Message.ProductId);
-        Activity.Current?.SetTag(DiagnosticNames.UserName, context.Message.CreatedBy);
+        Activity.Current?.EnrichWithMaintenancePlan(context.Message);
 
         await _eventHandler.HandleAsync(new MaintenancePlanCreatedEvent
         {
