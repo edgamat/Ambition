@@ -23,4 +23,5 @@ public static class TraceParentExtensions
         ArgumentNullException.ThrowIfNull(app);
 
         return app.UseMiddleware<TraceParentMiddleware>();
-    }}
+    }
+}

@@ -7,20 +7,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.ConfigureOpenTelemetry();
+builder.ConfigureSerilog();
 
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 
 builder.Services.AddHostedService<Worker>();
 
-// Add DbContextOptions<AriesContext> to the container
 builder.Services.AddSingleton(p => AccountingDbContextDesignTimeDbContextFactory.CreateOptions(builder.Configuration, builder.Environment));
 
-// Use DbContextOptions<AmbitionDbContext> to construct the context
 builder.Services.AddScoped(p => new AccountingDbContext(p.GetRequiredService<DbContextOptions<AccountingDbContext>>()));
 
-
-builder.Services.AddMessaging(builder.Configuration, builder.Environment);
+builder.Services.AddMessaging();
 
 builder.Services.AddScoped<IEventHandler<MaintenancePlanCreatedEvent>, MaintenancePlanCreatedHandler>();
 

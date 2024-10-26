@@ -15,6 +15,7 @@ public static class ConfigureTelemetry
 {
     public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
     {
+        var seqServerUrl = builder.Configuration.GetValue<string>("SEQ_SERVER_URL");
         var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
 
         // Global settings
@@ -37,17 +38,25 @@ public static class ConfigureTelemetry
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
 
-            logging.AddConsoleExporter();
+            if (builder.Environment.IsDevelopment())
+            {
+                logging.AddConsoleExporter();
+            }
+
             if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
             {
                 logging.AddAzureMonitorLogExporter(o => o.ConnectionString = appInsightsConnectionString);
             }
-            logging.AddOtlpExporter(configure =>
+
+            if (!string.IsNullOrWhiteSpace(seqServerUrl))
             {
-                configure.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/logs");
-                configure.Protocol = OtlpExportProtocol.HttpProtobuf;
-                configure.Headers = "X-Seq-ApiKey=yrC3VeSr8KbSsT3MJeiD";
-            });
+                logging.AddOtlpExporter(configure =>
+                {
+                    configure.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
+                    configure.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    configure.Headers = "X-Seq-ApiKey=yrC3VeSr8KbSsT3MJeiD";
+                });
+            }
         });
 
         // Tracing
@@ -71,18 +80,25 @@ public static class ConfigureTelemetry
                         options.SetDbStatementForStoredProcedure = builder.Environment.IsDevelopment();
                     });
 
-                tracing.AddConsoleExporter();
+                if (builder.Environment.IsDevelopment())
+                {
+                    tracing.AddConsoleExporter();
+                }
+
                 if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
                 {
                     tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = appInsightsConnectionString);
                 }
 
-                tracing.AddOtlpExporter(exporter =>
+                if (!string.IsNullOrWhiteSpace(seqServerUrl))
                 {
-                    exporter.Endpoint = new Uri("http://localhost:5341/ingest/otlp/v1/traces");
-                    exporter.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    exporter.Headers = "X-Seq-ApiKey=yrC3VeSr8KbSsT3MJeiD";
-                });
+                    tracing.AddOtlpExporter(exporter =>
+                    {
+                        exporter.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/traces");
+                        exporter.Protocol = OtlpExportProtocol.HttpProtobuf;
+                        exporter.Headers = "X-Seq-ApiKey=yrC3VeSr8KbSsT3MJeiD";
+                    });
+                }
             });
 
         return builder;

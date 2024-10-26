@@ -15,10 +15,8 @@ public static class DataServiceExtensions
         IConfiguration configuration,
         IHostEnvironment environment)
     {
-        // Add DbContextOptions<AriesContext> to the container
         services.AddSingleton(p => AmbitionDbContextDesignTimeDbContextFactory.CreateOptions(configuration, environment));
 
-        // Use DbContextOptions<AmbitionDbContext> to construct the context
         services.AddScoped(p => new AmbitionDbContext(p.GetRequiredService<DbContextOptions<AmbitionDbContext>>()));
 
         services.AddScoped<IMaintenancePlanRepository, MaintenancePlanRepository>();
