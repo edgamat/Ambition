@@ -70,8 +70,8 @@ public static class ConfigureTelemetry
                 tracing.AddHttpClientInstrumentation()
                     .AddSqlClientInstrumentation(options =>
                     {
-                        options.SetDbStatementForText = true;
-                        options.SetDbStatementForStoredProcedure = true;
+                        options.SetDbStatementForText = builder.Environment.IsDevelopment();
+                        options.SetDbStatementForStoredProcedure = builder.Environment.IsDevelopment();
                         options.Enrich = (activity, name, cmd) =>
                         {
                             if (cmd is SqlCommand sqlCommand)

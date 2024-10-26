@@ -67,8 +67,8 @@ public static class ConfigureTelemetry
                 tracing.AddAspNetCoreInstrumentation()
                     .AddSqlClientInstrumentation(options =>
                     {
-                        options.SetDbStatementForText = true;
-                        options.SetDbStatementForStoredProcedure = true;
+                        options.SetDbStatementForText = builder.Environment.IsDevelopment();
+                        options.SetDbStatementForStoredProcedure = builder.Environment.IsDevelopment();
                     });
 
                 tracing.AddConsoleExporter();
