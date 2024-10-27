@@ -11,9 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{96BF5630-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Ambition.Domain", "test\UnitTests.Ambition.Domain\UnitTests.Ambition.Domain.csproj", "{663DE666-B31D-44DD-AA7C-A5EEB875291B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.UI", "src\Ambition.UI\Ambition.UI.csproj", "{E793CFB3-9B4A-4EAF-803E-87FEAB6AC5C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.Api", "src\Ambition.Api\Ambition.Api.csproj", "{E793CFB3-9B4A-4EAF-803E-87FEAB6AC5C2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Ambition.UI", "test\UnitTests.Ambition.UI\UnitTests.Ambition.UI.csproj", "{A4B24562-6827-415E-9518-DFF4157714F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Ambition.Api", "test\UnitTests.Ambition.Api\UnitTests.Ambition.Api.csproj", "{A4B24562-6827-415E-9518-DFF4157714F2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ambition.Infrastructure", "src\Ambition.Infrastructure\Ambition.Infrastructure.csproj", "{03D167E0-6D0E-4516-94D1-52AC94C7439A}"
 EndProject

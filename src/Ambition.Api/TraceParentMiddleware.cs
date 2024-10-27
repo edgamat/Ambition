@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Ambition.UI;
+namespace Ambition.Api;
 
 public class TraceParentMiddleware(RequestDelegate next)
 {

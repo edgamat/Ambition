@@ -1,4 +1,4 @@
-﻿namespace Ambition.UI;
+﻿namespace Ambition.Api;
 
 public class CreatePlanModel
 {

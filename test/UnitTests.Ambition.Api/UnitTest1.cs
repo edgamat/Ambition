@@ -1,4 +1,4 @@
-namespace UnitTests.Ambition.UI;
+namespace UnitTests.Ambition.Api;
 
 public class UnitTest1
 {

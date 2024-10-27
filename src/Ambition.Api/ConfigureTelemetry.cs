@@ -9,7 +9,7 @@ using OpenTelemetry.Resources;
 
 using OpenTelemetry.Trace;
 
-namespace Ambition.UI;
+namespace Ambition.Api;
 
 public static class ConfigureTelemetry
 {

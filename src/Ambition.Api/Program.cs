@@ -1,5 +1,5 @@
 using Ambition.Domain;
-using Ambition.UI;
+using Ambition.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
