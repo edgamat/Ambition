@@ -1,9 +1,9 @@
-using Ambition.Domain;
 using Ambition.Api;
+using Ambition.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.ConfigureSerilog();
+builder.ConfigureOpenTelemetry();
 
 builder.Services.AddProblemDetailsWithTraceId();
 builder.Services.AddEndpointsApiExplorer();

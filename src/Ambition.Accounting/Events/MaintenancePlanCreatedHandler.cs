@@ -6,6 +6,7 @@ using Ambition.Accounting.Emails;
 using Ambition.Accounting.Invoices;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 namespace Ambition.Accounting.Events;
 
@@ -14,22 +15,25 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
     private readonly ILogger<MaintenancePlanCreatedHandler> _logger;
     private readonly AccountingDbContext _dbContext;
     private readonly IEmailService _emailService;
+    private readonly IFeatureManager _featureManager;
 
     public MaintenancePlanCreatedHandler(
         ILogger<MaintenancePlanCreatedHandler> logger,
         AccountingDbContext dbContext,
-        IEmailService emailService)
+        IEmailService emailService,
+        IFeatureManager featureManager)
     {
         _logger = logger;
         _dbContext = dbContext;
         _emailService = emailService;
+        _featureManager = featureManager;
     }
 
     public async Task HandleAsync(MaintenancePlanCreatedEvent @event, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling MaintenancePlanCreated event for maintenance plan: {Id}", @event.Id);
 
-        var invoice = await _dbContext.Set<Invoice>().FirstOrDefaultAsync(i => i.MaintenancePlanId == @event.Id);
+        var invoice = await _dbContext.Set<Invoice>().FirstOrDefaultAsync(i => i.MaintenancePlanId == @event.Id, cancellationToken);
         if (invoice != null)
         {
             _logger.LogInformation("Invoice already exists for maintenance plan: {Id}", @event.Id);
@@ -68,12 +72,15 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
         var subject = "Invoice for Maintenance Plan";
         var body = $"Dear {customer.Name},\n\nAn invoice has been generated for your maintenance plan. Please find the details below:\n\nInvoice Number: {invoice.Number}\nAmount: {invoice.Amount:C}\nDue Date: {invoice.DueOn:dd-MMM-yyyy}\n\nThank you for choosing our services.\n\nRegards,\nAmbition Accounting Team";
 
-        await _emailService.SendEmailAsync(email, subject, body, cancellationToken);
-
-        var eventTags = new Dictionary<string, object?>
+        if (await _featureManager.IsEnabledAsync("SendEmails", cancellationToken))
         {
-            { DiagnosticNames.InvoiceId, invoiceId }
-        };
-        Activity.Current?.AddEvent(new ActivityEvent(DiagnosticNames.InvoiceSentEvent, tags: new(eventTags)));
+            await _emailService.SendEmailAsync(email, subject, body, cancellationToken);
+
+            var eventTags = new Dictionary<string, object?>
+            {
+                { DiagnosticNames.InvoiceId, invoiceId }
+            };
+            Activity.Current?.AddEvent(new ActivityEvent(DiagnosticNames.InvoiceSentEvent, tags: new(eventTags)));
+        }
     }
 }

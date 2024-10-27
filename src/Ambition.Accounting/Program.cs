@@ -4,10 +4,13 @@ using Ambition.Accounting.Emails;
 using Ambition.Accounting.Events;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.FeatureManagement;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.ConfigureSerilog();
+builder.ConfigureOpenTelemetry();
+
+builder.Services.AddFeatureManagement();
 
 builder.Services.AddHttpClient<IEmailService, EmailService>();
 
