@@ -1,5 +1,5 @@
-using Ambition.Domain;
 using Ambition.Api;
+using Ambition.Domain;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,7 +37,7 @@ public static class MaintenancePlanEndpoints
 
             await maintenancePlanService.CreateAsync(plan);
 
-            return Results.Created($"/maintenance-plan/{plan.Id}", model);
+            return Results.Created($"/maintenance-plan/{plan.Id}", plan);
         })
         .WithName("Create")
         .WithOpenApi();
