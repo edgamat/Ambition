@@ -16,6 +16,7 @@ public static class ConfigureTelemetry
     public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
     {
         var seqServerUrl = builder.Configuration.GetValue<string>("SEQ_SERVER_URL");
+        var seqApiKey = builder.Configuration.GetValue<string>("SEQ_API_KEY");
         var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
 
         // Global settings
@@ -50,13 +51,14 @@ public static class ConfigureTelemetry
 
             if (!string.IsNullOrWhiteSpace(seqServerUrl))
             {
-                logging.AddOtlpExporter(configure =>
+                logging.AddOtlpExporter(options =>
                 {
-                    configure.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
-                    configure.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    configure.Headers = "X-Seq-ApiKey=yrC3VeSr8KbSsT3MJeiD";
+                    options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
+                    options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    options.Headers = $"X-Seq-ApiKey={seqApiKey}";
                 });
             }
+            logging.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
         });
 
         // Tracing
@@ -92,13 +94,14 @@ public static class ConfigureTelemetry
 
                 if (!string.IsNullOrWhiteSpace(seqServerUrl))
                 {
-                    tracing.AddOtlpExporter(exporter =>
+                    tracing.AddOtlpExporter(options =>
                     {
-                        exporter.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/traces");
-                        exporter.Protocol = OtlpExportProtocol.HttpProtobuf;
-                        exporter.Headers = "X-Seq-ApiKey=yrC3VeSr8KbSsT3MJeiD";
+                        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/traces");
+                        options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
                     });
                 }
+                tracing.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
             });
 
         return builder;

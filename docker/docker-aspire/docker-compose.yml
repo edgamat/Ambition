@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  seq:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:8.2
+    container_name: aspire-dashboard
+    environment:
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: true
+    ports:
+      - "18888:18888"
+      - "4317:18889"
+    restart: unless-stopped
