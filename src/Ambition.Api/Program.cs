@@ -4,6 +4,7 @@ using Ambition.Domain;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.ConfigureOpenTelemetry();
+builder.ConfigureHealthChecks();
 
 builder.Services.AddProblemDetailsWithTraceId();
 builder.Services.AddEndpointsApiExplorer();
