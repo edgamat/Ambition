@@ -8,7 +8,7 @@ using Microsoft.FeatureManagement;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.ConfigureOpenTelemetry();
+builder.ConfigureSerilog();
 
 builder.Services.AddFeatureManagement();
 

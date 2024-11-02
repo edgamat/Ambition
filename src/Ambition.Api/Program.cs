@@ -3,7 +3,7 @@ using Ambition.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.ConfigureOpenTelemetry();
+builder.ConfigureSerilog();
 builder.ConfigureHealthChecks();
 
 builder.Services.AddProblemDetailsWithTraceId();

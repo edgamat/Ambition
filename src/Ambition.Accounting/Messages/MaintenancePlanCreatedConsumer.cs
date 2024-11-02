@@ -26,13 +26,21 @@ public class MaintenancePlanCreatedConsumer : IConsumer<MaintenancePlanCreated>
 
         Activity.Current?.EnrichWithMaintenancePlan(context.Message);
 
-        await _eventHandler.HandleAsync(new MaintenancePlanCreatedEvent
+        try
         {
-            Id = context.Message.Id,
-            ProductId = context.Message.ProductId,
-            CustomerId = context.Message.CustomerId,
-            CreatedBy = context.Message.CreatedBy,
-            CreatedAt = context.Message.CreatedAt
-        }, context.CancellationToken);
+            await _eventHandler.HandleAsync(new MaintenancePlanCreatedEvent
+            {
+                Id = context.Message.Id,
+                ProductId = context.Message.ProductId,
+                CustomerId = context.Message.CustomerId,
+                CreatedBy = context.Message.CreatedBy,
+                CreatedAt = context.Message.CreatedAt
+            }, context.CancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to handle MaintenancePlanCreated message for maintenance plan: {PlanId}", context.Message.Id);
+            throw;
+        }
     }
 }
