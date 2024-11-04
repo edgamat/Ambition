@@ -28,7 +28,7 @@ public static class ConfigureTelemetry
                 resourceBuilder.AddService(
                     serviceName: builder.Environment.ApplicationName,
                     serviceVersion: GetAssemblyVersion(),
-                    serviceInstanceId: Environment.MachineName);
+                    serviceInstanceId: $"{Environment.MachineName}-{Guid.NewGuid()}");
                 resourceBuilder.AddAttributes(new Dictionary<string, object>
                 {
                     ["deployment.environment.name"] = builder.Environment.EnvironmentName
@@ -44,6 +44,9 @@ public static class ConfigureTelemetry
             if (builder.Environment.IsDevelopment())
             {
                 logging.AddConsoleExporter();
+
+                // Aspire Dashboard
+                logging.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
             }
 
             if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
@@ -60,21 +63,19 @@ public static class ConfigureTelemetry
                     options.Headers = $"X-Seq-ApiKey={seqApiKey}";
                 });
             }
-            logging.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
         });
 
         // Tracing
         builder.Services.AddOpenTelemetry()
             .WithTracing(tracing =>
             {
-                if (builder.Environment.IsDevelopment())
-                {
-                    // We want to view all traces in development
-                    tracing.SetSampler<AlwaysOnSampler>();
-                }
+                // We want to view all traces
+                tracing.SetSampler<AlwaysOnSampler>();
 
+                // We want to capture custom traces from our application
                 tracing.AddSource(builder.Environment.ApplicationName);
 
+                // We want to capture traces from MassTransit
                 tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
 
                 tracing.AddHttpClientInstrumentation()
@@ -92,6 +93,9 @@ public static class ConfigureTelemetry
                 if (builder.Environment.IsDevelopment())
                 {
                     tracing.AddConsoleExporter();
+
+                    // Asipre Dashboard
+                    tracing.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
                 }
 
                 if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
@@ -108,7 +112,6 @@ public static class ConfigureTelemetry
                         options.Headers = $"X-Seq-ApiKey={seqApiKey}";
                     });
                 }
-                tracing.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
             });
 
         return builder;

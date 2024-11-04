@@ -18,11 +18,10 @@ public class EmailService : IEmailService
     {
         _logger.LogInformation("Sending email to {Email} with subject {Subject}", email, subject);
 
-        // create a random number between 0 and 1
-        if (new Random().NextDouble() < 0.5)
-        {
-            throw new Exception("Failed to send email");
-        }
+        //if (new Random().NextDouble() < 0.5)
+        //{
+        //    throw new Exception("Failed to send email");
+        //}
 
         _httpClient.BaseAddress = new Uri("http://api.mercury-email.internal:5222/");
 

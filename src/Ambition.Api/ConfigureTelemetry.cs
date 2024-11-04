@@ -2,6 +2,8 @@
 
 using Azure.Monitor.OpenTelemetry.Exporter;
 
+using Microsoft.Data.SqlClient;
+
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 
@@ -42,6 +44,9 @@ public static class ConfigureTelemetry
             if (builder.Environment.IsDevelopment())
             {
                 logging.AddConsoleExporter();
+
+                // Aspire Dashboard
+                logging.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
             }
 
             if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
@@ -58,21 +63,19 @@ public static class ConfigureTelemetry
                     options.Headers = $"X-Seq-ApiKey={seqApiKey}";
                 });
             }
-            logging.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
         });
 
         // Tracing
         builder.Services.AddOpenTelemetry()
             .WithTracing(tracing =>
             {
-                if (builder.Environment.IsDevelopment())
-                {
-                    // We want to view all traces in development
-                    tracing.SetSampler<AlwaysOnSampler>();
-                }
+                // We want to view all traces
+                tracing.SetSampler<AlwaysOnSampler>();
 
+                // We want to capture custom traces from our application
                 tracing.AddSource(builder.Environment.ApplicationName);
 
+                // We want to capture traces from MassTransit
                 tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
 
                 tracing.AddAspNetCoreInstrumentation()
@@ -80,11 +83,19 @@ public static class ConfigureTelemetry
                     {
                         options.SetDbStatementForText = builder.Environment.IsDevelopment();
                         options.SetDbStatementForStoredProcedure = builder.Environment.IsDevelopment();
+                        options.Enrich = (activity, name, cmd) =>
+                        {
+                            if (cmd is SqlCommand sqlCommand)
+                                activity.SetTag("db.parameter-count", sqlCommand.Parameters.Count);
+                        };
                     });
 
                 if (builder.Environment.IsDevelopment())
                 {
                     tracing.AddConsoleExporter();
+
+                    // Aspire Dashboard
+                    tracing.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
                 }
 
                 if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
@@ -101,7 +112,6 @@ public static class ConfigureTelemetry
                         options.Headers = $"X-Seq-ApiKey={seqApiKey}";
                     });
                 }
-                tracing.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
             });
 
         return builder;
