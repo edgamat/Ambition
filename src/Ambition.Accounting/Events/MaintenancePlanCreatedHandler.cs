@@ -78,9 +78,9 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
 
             var eventTags = new Dictionary<string, object?>
             {
-                { DiagnosticNames.InvoiceId, invoiceId }
+                { DiagnosticsNames.InvoiceId, invoiceId }
             };
-            Activity.Current?.AddEvent(new ActivityEvent(DiagnosticNames.InvoiceSentEvent, tags: new(eventTags)));
+            Activity.Current?.AddEvent(new ActivityEvent(DiagnosticsNames.InvoiceSentEvent, tags: new(eventTags)));
         }
     }
 }

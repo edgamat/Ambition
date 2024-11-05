@@ -1,6 +1,6 @@
 ﻿namespace Ambition.Accounting;
 
-internal class DiagnosticNames
+internal class DiagnosticsNames
 {
     public const string MaintenancePlanId = "maintenance_plan.id";
     public const string MaintenancePlanProductId = "maintenance_plan.product_id";

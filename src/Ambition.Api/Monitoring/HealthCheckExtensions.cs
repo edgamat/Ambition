@@ -2,7 +2,7 @@
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Ambition.Api
+namespace Ambition.Api.Monitoring
 {
     public static class HealthCheckExtensions
     {

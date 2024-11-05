@@ -20,6 +20,8 @@ public class MaintenancePlanService : IMaintenancePlanService
 
     public async Task<Guid> CreateAsync(MaintenancePlan maintenancePlan)
     {
+        using var activity = DiagnosticsConfig.Source.StartActivity("Create maintenance plan");
+
         Activity.Current?.EnrichWithMaintenancePlan(maintenancePlan);
 
         if (maintenancePlan.Id == Guid.Empty)

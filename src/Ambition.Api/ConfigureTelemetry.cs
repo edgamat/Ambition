@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+using Ambition.Domain;
+
 using Azure.Monitor.OpenTelemetry.Exporter;
 
 using Microsoft.Data.SqlClient;
@@ -73,7 +75,7 @@ public static class ConfigureTelemetry
                 tracing.SetSampler<AlwaysOnSampler>();
 
                 // We want to capture custom traces from our application
-                tracing.AddSource(builder.Environment.ApplicationName);
+                tracing.AddSource(DiagnosticsConfig.ServiceName);
 
                 // We want to capture traces from MassTransit
                 tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);

@@ -1,4 +1,4 @@
-﻿namespace Ambition.Api;
+﻿namespace Ambition.Api.MaintenancePlans;
 
 public class CreatePlanModel
 {

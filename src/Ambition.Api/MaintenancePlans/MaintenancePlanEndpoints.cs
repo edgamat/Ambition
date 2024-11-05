@@ -1,10 +1,9 @@
-using Ambition.Api;
 using Ambition.Domain;
 
 using Microsoft.AspNetCore.Mvc;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
-namespace Microsoft.Extensions.Hosting;
+namespace Ambition.Api.MaintenancePlans;
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 
 public static class MaintenancePlanEndpoints

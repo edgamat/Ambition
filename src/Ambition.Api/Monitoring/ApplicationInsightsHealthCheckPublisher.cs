@@ -4,7 +4,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Ambition.Api
+namespace Ambition.Api.Monitoring
 {
     public class ApplicationInsightsHealthCheckPublisher : IHealthCheckPublisher
     {

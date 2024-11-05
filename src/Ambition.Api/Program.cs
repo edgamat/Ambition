@@ -1,4 +1,6 @@
 using Ambition.Api;
+using Ambition.Api.MaintenancePlans;
+using Ambition.Api.Monitoring;
 using Ambition.Domain;
 
 var builder = WebApplication.CreateBuilder(args);
