@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace Ambition.Domain;
 
@@ -22,7 +20,10 @@ public class MaintenancePlanService : IMaintenancePlanService
     {
         using var activity = DiagnosticsConfig.Source.StartActivity(DiagnosticsNames.CreateMaintenancePlan);
 
-        Activity.Current?.EnrichWithMaintenancePlan(maintenancePlan);
+        activity?.SetTag(DiagnosticsNames.MaintenancePlanId, maintenancePlan.Id);
+        activity?.SetTag(DiagnosticsNames.MaintenancePlanProductId, maintenancePlan.ProductId);
+        activity?.SetTag(DiagnosticsNames.MaintenancePlanCustomerId, maintenancePlan.CustomerId);
+        activity?.SetTag(DiagnosticsNames.UserName, maintenancePlan.CreatedBy);
 
         if (maintenancePlan.Id == Guid.Empty)
         {
@@ -31,7 +32,7 @@ public class MaintenancePlanService : IMaintenancePlanService
 
         await _repository.AddAsync(maintenancePlan);
 
-        _logger.LogInformation("Maintenance plan {MaintenancePlanId} created for product {ProductId} customer {CustomerId} customer {CreatedBy}"
+        _logger.LogInformation("Maintenance plan {MaintenancePlanId} created for product {ProductId} customer {CustomerId} created by {CreatedBy}"
             , maintenancePlan.Id, maintenancePlan.ProductId, maintenancePlan.CustomerId, maintenancePlan.CreatedBy);
 
         var maintenancePlanCreated = new MaintenancePlanCreated(

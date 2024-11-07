@@ -18,10 +18,10 @@ public class EmailService : IEmailService
     {
         _logger.LogInformation("Sending email to {Email} with subject {Subject}", email, subject);
 
-        if (new Random().NextDouble() < 1.25)
-        {
-            _httpClient.Timeout = TimeSpan.FromSeconds(1);
-        }
+        //if (new Random().NextDouble() < 0.25)
+        //{
+        //    _httpClient.Timeout = TimeSpan.FromSeconds(1);
+        //}
 
         _httpClient.BaseAddress = new Uri("http://api.mercury-email.internal:5222/");
         using StringContent jsonContent = new(

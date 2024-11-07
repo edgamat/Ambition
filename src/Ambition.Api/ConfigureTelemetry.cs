@@ -30,7 +30,7 @@ public static class ConfigureTelemetry
                 resourceBuilder.AddService(
                     serviceName: builder.Environment.ApplicationName,
                     serviceVersion: GetAssemblyVersion(),
-                    serviceInstanceId: Environment.MachineName);
+                    serviceInstanceId: $"{Environment.MachineName}-{Guid.NewGuid()}");
                 resourceBuilder.AddAttributes(new Dictionary<string, object>
                 {
                     ["deployment.environment.name"] = builder.Environment.EnvironmentName
