@@ -20,7 +20,7 @@ public class MaintenancePlanService : IMaintenancePlanService
 
     public async Task<Guid> CreateAsync(MaintenancePlan maintenancePlan)
     {
-        using var activity = DiagnosticsConfig.Source.StartActivity("Create maintenance plan");
+        using var activity = DiagnosticsConfig.Source.StartActivity(DiagnosticsNames.CreateMaintenancePlan);
 
         Activity.Current?.EnrichWithMaintenancePlan(maintenancePlan);
 
@@ -31,8 +31,8 @@ public class MaintenancePlanService : IMaintenancePlanService
 
         await _repository.AddAsync(maintenancePlan);
 
-        _logger.LogInformation("Maintenance plan {MaintenancePlanId} created for product {ProductId} and customer {CustomerId}"
-            , maintenancePlan.Id, maintenancePlan.ProductId, maintenancePlan.CustomerId);
+        _logger.LogInformation("Maintenance plan {MaintenancePlanId} created for product {ProductId} customer {CustomerId} customer {CreatedBy}"
+            , maintenancePlan.Id, maintenancePlan.ProductId, maintenancePlan.CustomerId, maintenancePlan.CreatedBy);
 
         var maintenancePlanCreated = new MaintenancePlanCreated(
             maintenancePlan.Id,

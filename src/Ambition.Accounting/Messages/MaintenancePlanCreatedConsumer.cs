@@ -39,8 +39,8 @@ public class MaintenancePlanCreatedConsumer : IConsumer<MaintenancePlanCreated>
         }
         catch (Exception ex)
         {
+            Activity.Current?.SetStatus(ActivityStatusCode.Error);
             _logger.LogError(ex, "Failed to handle MaintenancePlanCreated message for maintenance plan: {PlanId}", context.Message.Id);
-            throw;
         }
     }
 }

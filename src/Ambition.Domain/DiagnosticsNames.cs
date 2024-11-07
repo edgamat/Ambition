@@ -7,4 +7,6 @@ internal static class DiagnosticsNames
     public const string MaintenancePlanCustomerId = "maintenance_plan.customer_id";
 
     public const string UserName = "user.name";
+
+    public const string CreateMaintenancePlan = "Create maintenance plan";
 }
