@@ -27,23 +27,23 @@ There are Docker Compose files in the `docker` folder to run:
 
 ## Blog Posts
 
-Distributed Tracing in .NET - Part 0 - The Sample Application
+Distributed Tracing in .NET - Part 0 - The Sample Application   
 https://edgamat.com/2024/03/20/Distributed-Tracing-Part-0.html
 
-Distributed Tracing in .NET - Part 1 - Setup Open Telemetry
-https://edgamat.com/2024/03/20/Distributed-Tracing-Part-1.html
+Distributed Tracing in .NET - Part 1 - Setup Open Telemetry  
+https://edgamat.com/2024/03/20/Distributed-Tracing-Part-1.html  
 
-Distributed Tracing in .NET - Part 2 - Exception Handling
-https://edgamat.com/2024/03/22/Distributed-Tracing-Part-2.html
+Distributed Tracing in .NET - Part 2 - Exception Handling  
+https://edgamat.com/2024/03/22/Distributed-Tracing-Part-2.html  
 
-Distributed Tracing in .NET - Part 3 - Adding Custom Dimensions
-https://edgamat.com/2024/03/31/Distributed-Tracing-Part-3.html
+Distributed Tracing in .NET - Part 3 - Adding Custom Dimensions  
+https://edgamat.com/2024/03/31/Distributed-Tracing-Part-3.html  
 
-Logging Diagnostic Activities in .NET
-https://edgamat.com/2024/04/07/Logging-Activities.html
+Logging Diagnostic Activities in .NET  
+https://edgamat.com/2024/04/07/Logging-Activities.html 
 
-Recording Exceptions with Diagnostic Activities in .NET
+Recording Exceptions with Diagnostic Activities in .NET  
 https://edgamat.com/2024/04/07/Recording-Exceptions-Activities.html
 
-Configuring Serilog to use OpenTelemetry
+Configuring Serilog to use OpenTelemetry  
 https://edgamat.com/2024/04/27/Use-OpenTelemetry-With-Serilog.html
