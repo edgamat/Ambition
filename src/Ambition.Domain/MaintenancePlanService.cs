@@ -20,10 +20,7 @@ public class MaintenancePlanService : IMaintenancePlanService
     {
         using var activity = DiagnosticsConfig.Source.StartActivity(DiagnosticsNames.CreateMaintenancePlan);
 
-        activity?.SetTag(DiagnosticsNames.MaintenancePlanId, maintenancePlan.Id);
-        activity?.SetTag(DiagnosticsNames.MaintenancePlanProductId, maintenancePlan.ProductId);
-        activity?.SetTag(DiagnosticsNames.MaintenancePlanCustomerId, maintenancePlan.CustomerId);
-        activity?.SetTag(DiagnosticsNames.UserName, maintenancePlan.CreatedBy);
+        activity?.EnrichWithMaintenancePlan(maintenancePlan);
 
         if (maintenancePlan.Id == Guid.Empty)
         {

@@ -94,7 +94,7 @@ public static class ConfigureTelemetry
                 {
                     tracing.AddConsoleExporter();
 
-                    // Asipre Dashboard
+                    // Aspire Dashboard
                     tracing.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
                 }
 
