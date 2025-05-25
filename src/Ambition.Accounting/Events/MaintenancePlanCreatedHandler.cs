@@ -57,6 +57,14 @@ public class MaintenancePlanCreatedHandler : IEventHandler<MaintenancePlanCreate
 
         _dbContext.Set<Invoice>().Add(invoice);
 
+        var customerEvent = new CustomerEvent
+        {
+            CustomerId = @event.CustomerId,
+            Description = "Invoice generated for maintenance plan"
+        };
+
+        _dbContext.Set<CustomerEvent>().Add(customerEvent);
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Invoice {InvoiceID} created for maintenance plan: {Id}", invoiceId, @event.Id);
