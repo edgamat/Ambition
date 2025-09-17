@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "src\\Ambition.Api\\Ambition.Api.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "src\\Ambition.Accounting\\Ambition.Accounting.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "src\\Mercury.Email\\Mercury.Email.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

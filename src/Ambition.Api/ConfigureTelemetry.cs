@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 
 using Ambition.Domain;
 
@@ -6,6 +7,7 @@ using Azure.Monitor.OpenTelemetry.Exporter;
 
 using Microsoft.Data.SqlClient;
 
+using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 
@@ -23,18 +25,22 @@ public static class ConfigureTelemetry
         var seqApiKey = builder.Configuration.GetValue<string>("SEQ_API_KEY");
         var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
 
+        var resourceAttributes = new Dictionary<string, object> {
+            { "service.name", builder.Environment.ApplicationName },
+            { "service.version", GetAssemblyVersion() },
+            { "service.namespace", "Ambition" },
+            { "service.instance.id", $"{Environment.MachineName}-{Guid.NewGuid()}" }
+        };
+
+        var defaultAttributes = new Dictionary<string, object> {
+            { "deployment.environment.name", builder.Environment.EnvironmentName }
+        };
+
         // Global settings
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resourceBuilder =>
             {
-                resourceBuilder.AddService(
-                    serviceName: builder.Environment.ApplicationName,
-                    serviceVersion: GetAssemblyVersion(),
-                    serviceInstanceId: $"{Environment.MachineName}-{Guid.NewGuid()}");
-                resourceBuilder.AddAttributes(new Dictionary<string, object>
-                {
-                    ["deployment.environment.name"] = builder.Environment.EnvironmentName
-                });
+                resourceBuilder.AddAttributes(resourceAttributes);
             });
 
         // Logging
@@ -42,6 +48,9 @@ public static class ConfigureTelemetry
         {
             logging.IncludeFormattedMessage = true;
             logging.IncludeScopes = true;
+
+            // We want to add some default attributes to all our logs
+            logging.AddProcessor(new AddAttributesProcessor(defaultAttributes));
 
             if (builder.Environment.IsDevelopment())
             {
@@ -74,6 +83,9 @@ public static class ConfigureTelemetry
                 // We want to view all traces
                 tracing.SetSampler<AlwaysOnSampler>();
 
+                // We want to add some default attributes to all our traces
+                tracing.AddProcessor(new AddSpanTagsProcessor(defaultAttributes));
+
                 // We want to capture custom traces from our application
                 tracing.AddSource(DiagnosticsConfig.ServiceName);
 
@@ -84,7 +96,6 @@ public static class ConfigureTelemetry
                     .AddSqlClientInstrumentation(options =>
                     {
                         options.SetDbStatementForText = builder.Environment.IsDevelopment();
-                        options.SetDbStatementForStoredProcedure = builder.Environment.IsDevelopment();
                         options.Enrich = (activity, name, cmd) =>
                         {
                             if (cmd is SqlCommand sqlCommand)
@@ -126,5 +137,62 @@ public static class ConfigureTelemetry
             .FirstOrDefault() as AssemblyInformationalVersionAttribute;
 
         return infoVersion?.InformationalVersion ?? "0.0.0.0";
+    }
+}
+
+public class AddAttributesProcessor : BaseProcessor<LogRecord>
+{
+    private readonly IDictionary<string, object> _attributes;
+
+    public AddAttributesProcessor(IDictionary<string, object> attributes)
+    {
+        _attributes = attributes;
+    }
+    public override void OnEnd(LogRecord data)
+    {
+        var attrs = data.Attributes?.ToList();
+        if (attrs is null)
+            return;
+
+        // Remove any existing attributes with the same keys
+        for (var i = attrs.Count - 1; i >= 0; i--)
+        {
+            if (_attributes.ContainsKey(attrs[i].Key))
+            {
+                attrs.RemoveAt(i);
+            }
+        }
+
+        // Add our attributes
+        foreach (var (key, value) in _attributes)
+        {
+            attrs.Add(new(key, value));
+        }
+
+        data.Attributes = attrs;
+    }
+}
+
+public class AddSpanTagsProcessor : BaseProcessor<Activity>
+{
+    private readonly IDictionary<string, object> _attributes;
+
+    public AddSpanTagsProcessor(IDictionary<string, object> attributes)
+    {
+        _attributes = attributes;
+    }
+    public override void OnEnd(Activity data)
+    {
+        if (data is null)
+            return;
+
+        foreach (var (key, value) in _attributes)
+        {
+            if (!data.Tags.Any(t => t.Key == key))
+            {
+                data.SetTag(key, value);
+            }
+        }
+        base.OnEnd(data);
     }
 }
