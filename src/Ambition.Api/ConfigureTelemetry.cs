@@ -3,14 +3,11 @@ using System.Reflection;
 
 using Ambition.Domain;
 
-using Azure.Monitor.OpenTelemetry.Exporter;
-
 using Microsoft.Data.SqlClient;
 
 using OpenTelemetry;
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
-
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 
 using OpenTelemetry.Trace;
@@ -19,18 +16,20 @@ namespace Ambition.Api;
 
 public static class ConfigureTelemetry
 {
+    public static ResourceBuilder AddServiceAttributes(this ResourceBuilder builder, IHostEnvironment env)
+    {
+        return builder.AddService(
+            env.ApplicationName,
+            serviceNamespace: "Ambition",
+            serviceVersion: GetAssemblyVersion(),
+            serviceInstanceId: $"{Environment.MachineName}-{Guid.NewGuid()}");
+    }
+
     public static IHostApplicationBuilder ConfigureOpenTelemetry(this IHostApplicationBuilder builder)
     {
         var seqServerUrl = builder.Configuration.GetValue<string>("SEQ_SERVER_URL");
         var seqApiKey = builder.Configuration.GetValue<string>("SEQ_API_KEY");
         var appInsightsConnectionString = builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING");
-
-        var resourceAttributes = new Dictionary<string, object> {
-            { "service.name", builder.Environment.ApplicationName },
-            { "service.version", GetAssemblyVersion() },
-            { "service.namespace", "Ambition" },
-            { "service.instance.id", $"{Environment.MachineName}-{Guid.NewGuid()}" }
-        };
 
         var defaultAttributes = new Dictionary<string, object> {
             { "deployment.environment.name", builder.Environment.EnvironmentName }
@@ -40,8 +39,12 @@ public static class ConfigureTelemetry
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resourceBuilder =>
             {
-                resourceBuilder.AddAttributes(resourceAttributes);
-            });
+                resourceBuilder.AddEnvironmentVariableDetector();
+                resourceBuilder.AddTelemetrySdk();
+                resourceBuilder.AddServiceAttributes(builder.Environment);
+            })
+            .UseOtlpExporter();
+        // .UseOtlpExporter(OtlpExportProtocol.HttpProtobuf, new Uri("http://localhost:5341/ingest/otlp"));
 
         // Logging
         builder.Logging.AddOpenTelemetry(logging =>
@@ -56,24 +59,25 @@ public static class ConfigureTelemetry
             {
                 logging.AddConsoleExporter();
 
-                // Aspire Dashboard
-                logging.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
+                //// Collector
+                //logging.AddOtlpExporter(options =>
+                //{
+                //    options.Endpoint = new Uri("http://localhost:5341/ingest/otlp");
+                //    options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                //});
             }
 
-            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
-            {
-                logging.AddAzureMonitorLogExporter(o => o.ConnectionString = appInsightsConnectionString);
-            }
+            // logging.AddAzureMonitorLogExporter();
 
-            if (!string.IsNullOrWhiteSpace(seqServerUrl))
-            {
-                logging.AddOtlpExporter(options =>
-                {
-                    options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
-                    options.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    options.Headers = $"X-Seq-ApiKey={seqApiKey}";
-                });
-            }
+            //if (!string.IsNullOrWhiteSpace(seqServerUrl))
+            //{
+            //    logging.AddOtlpExporter(options =>
+            //    {
+            //        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
+            //        options.Protocol = OtlpExportProtocol.HttpProtobuf;
+            //        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
+            //    });
+            //}
         });
 
         // Tracing
@@ -107,24 +111,28 @@ public static class ConfigureTelemetry
                 {
                     tracing.AddConsoleExporter();
 
-                    // Aspire Dashboard
-                    tracing.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
+                    //// Collector
+                    //tracing.AddOtlpExporter(options =>
+                    //{
+                    //    options.Endpoint = new Uri("http://localhost:4318");
+                    //    options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    //});
                 }
 
-                if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
-                {
-                    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = appInsightsConnectionString);
-                }
+                //if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+                //{
+                //    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = appInsightsConnectionString);
+                //}
 
-                if (!string.IsNullOrWhiteSpace(seqServerUrl))
-                {
-                    tracing.AddOtlpExporter(options =>
-                    {
-                        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/traces");
-                        options.Protocol = OtlpExportProtocol.HttpProtobuf;
-                        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
-                    });
-                }
+                //if (!string.IsNullOrWhiteSpace(seqServerUrl))
+                //{
+                //    tracing.AddOtlpExporter(options =>
+                //    {
+                //        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/traces");
+                //        options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                //        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
+                //    });
+                //}
             });
 
         return builder;

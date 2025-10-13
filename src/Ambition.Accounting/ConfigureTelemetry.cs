@@ -1,12 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-using Azure.Monitor.OpenTelemetry.Exporter;
-
 using Microsoft.Data.SqlClient;
 
 using OpenTelemetry;
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 
 using OpenTelemetry.Resources;
@@ -39,7 +36,9 @@ public static class ConfigureTelemetry
             .ConfigureResource(resourceBuilder =>
             {
                 resourceBuilder.AddAttributes(resourceAttributes);
-            });
+            })
+            .UseOtlpExporter();
+        // .UseOtlpExporter(OtlpExportProtocol.HttpProtobuf, new Uri("http://localhost:5341/ingest/otlp"));
 
         // Logging
         builder.Logging.AddOpenTelemetry(logging =>
@@ -54,24 +53,28 @@ public static class ConfigureTelemetry
             {
                 logging.AddConsoleExporter();
 
-                // Aspire Dashboard
-                logging.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
+                //// Collector
+                //logging.AddOtlpExporter(options =>
+                //{
+                //    options.Endpoint = new Uri("http://localhost:4318");
+                //    options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                //});
             }
 
-            if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
-            {
-                logging.AddAzureMonitorLogExporter(o => o.ConnectionString = appInsightsConnectionString);
-            }
+            //if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+            //{
+            //    logging.AddAzureMonitorLogExporter(o => o.ConnectionString = appInsightsConnectionString);
+            //}
 
-            if (!string.IsNullOrWhiteSpace(seqServerUrl))
-            {
-                logging.AddOtlpExporter(options =>
-                {
-                    options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
-                    options.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    options.Headers = $"X-Seq-ApiKey={seqApiKey}";
-                });
-            }
+            //if (!string.IsNullOrWhiteSpace(seqServerUrl))
+            //{
+            //    logging.AddOtlpExporter(options =>
+            //    {
+            //        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
+            //        options.Protocol = OtlpExportProtocol.HttpProtobuf;
+            //        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
+            //    });
+            //}
         });
 
         // Tracing
@@ -105,24 +108,28 @@ public static class ConfigureTelemetry
                 {
                     tracing.AddConsoleExporter();
 
-                    // Aspire Dashboard
-                    tracing.AddOtlpExporter(options => options.Endpoint = new Uri("http://localhost:4317"));
+                    //// Collector
+                    //tracing.AddOtlpExporter(options =>
+                    //{
+                    //    options.Endpoint = new Uri("http://localhost:4318");
+                    //    options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    //});
                 }
 
-                if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
-                {
-                    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = appInsightsConnectionString);
-                }
+                //if (!string.IsNullOrWhiteSpace(appInsightsConnectionString))
+                //{
+                //    tracing.AddAzureMonitorTraceExporter(o => o.ConnectionString = appInsightsConnectionString);
+                //}
 
-                if (!string.IsNullOrWhiteSpace(seqServerUrl))
-                {
-                    tracing.AddOtlpExporter(options =>
-                    {
-                        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/traces");
-                        options.Protocol = OtlpExportProtocol.HttpProtobuf;
-                        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
-                    });
-                }
+                //if (!string.IsNullOrWhiteSpace(seqServerUrl))
+                //{
+                //    tracing.AddOtlpExporter(options =>
+                //    {
+                //        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/traces");
+                //        options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                //        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
+                //    });
+                //}
             });
 
         return builder;
