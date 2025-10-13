@@ -4,6 +4,7 @@ using System.Reflection;
 using Microsoft.Data.SqlClient;
 
 using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 
 using OpenTelemetry.Resources;
@@ -36,9 +37,9 @@ public static class ConfigureTelemetry
             .ConfigureResource(resourceBuilder =>
             {
                 resourceBuilder.AddAttributes(resourceAttributes);
-            })
-            .UseOtlpExporter();
-        // .UseOtlpExporter(OtlpExportProtocol.HttpProtobuf, new Uri("http://localhost:5341/ingest/otlp"));
+            });
+        //.UseOtlpExporter();
+        //.UseOtlpExporter(OtlpExportProtocol.HttpProtobuf, new Uri("http://localhost:5341/ingest/otlp"));
 
         // Logging
         builder.Logging.AddOpenTelemetry(logging =>
@@ -47,7 +48,7 @@ public static class ConfigureTelemetry
             logging.IncludeScopes = true;
 
             // We want to add some default attributes to all our logs
-            logging.AddProcessor(new AddAttributesProcessor(defaultAttributes));
+            // logging.AddProcessor(new AddAttributesProcessor(defaultAttributes));
 
             if (builder.Environment.IsDevelopment())
             {
@@ -66,15 +67,15 @@ public static class ConfigureTelemetry
             //    logging.AddAzureMonitorLogExporter(o => o.ConnectionString = appInsightsConnectionString);
             //}
 
-            //if (!string.IsNullOrWhiteSpace(seqServerUrl))
-            //{
-            //    logging.AddOtlpExporter(options =>
-            //    {
-            //        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
-            //        options.Protocol = OtlpExportProtocol.HttpProtobuf;
-            //        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
-            //    });
-            //}
+            if (!string.IsNullOrWhiteSpace(seqServerUrl))
+            {
+                logging.AddOtlpExporter(options =>
+                {
+                    options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
+                    options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    options.Headers = $"X-Seq-ApiKey={seqApiKey}";
+                });
+            }
         });
 
         // Tracing
