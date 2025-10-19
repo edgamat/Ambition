@@ -5,9 +5,9 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development",
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "XXOTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
-        "XXOTEL_EXPORTER_OTLP_LOGS_ENDPOINT": "http://localhost:5341/ingest/otlp/v1/logs",
-        "XXOTEL_EXPORTER_OTLP_TRACES_ENDPOINT": "http://localhost:5341/ingest/otlp/v1/traces",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_EXPORTER_OTLP_LOGS_ENDPOINT": "http://localhost:5341/ingest/otlp/v1/logs",
+        "OTEL_EXPORTER_OTLP_TRACES_ENDPOINT": "http://localhost:5341/ingest/otlp/v1/traces",
         "OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES": "true"
       },
       "dotnetRunMessages": true

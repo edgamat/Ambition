@@ -1,21 +1,21 @@
 ﻿using Ambition.Domain;
 
-using MassTransit;
+using Edgamat.Messaging;
 
 namespace Ambition.Infrastructure.Events;
 
 internal class EventPublisher : IEventPublisher
 {
-    private readonly IPublishEndpoint _bus;
+    private readonly IPublisher _publisher;
 
-    public EventPublisher(IPublishEndpoint bus)
+    public EventPublisher(IPublisher publisher)
     {
-        _bus = bus;
+        _publisher = publisher;
     }
 
     public async Task PublishAsync<T>(T @event, string topic) where T : class
     {
-        await _bus.Publish(@event);
+        await _publisher.PublishAsync(topic, @event);
     }
 }
 

@@ -6,7 +6,6 @@ using Ambition.Domain;
 using Microsoft.Data.SqlClient;
 
 using OpenTelemetry;
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -43,8 +42,8 @@ public static class ConfigureTelemetry
                 resourceBuilder.AddEnvironmentVariableDetector();
                 resourceBuilder.AddTelemetrySdk();
                 resourceBuilder.AddServiceAttributes(builder.Environment);
-            });
-        // .UseOtlpExporter();
+            })
+        .UseOtlpExporter();
         // .UseOtlpExporter(OtlpExportProtocol.HttpProtobuf, new Uri("http://localhost:5341/ingest/otlp"));
 
         // Logging
@@ -70,15 +69,15 @@ public static class ConfigureTelemetry
 
             // logging.AddAzureMonitorLogExporter();
 
-            if (!string.IsNullOrWhiteSpace(seqServerUrl))
-            {
-                logging.AddOtlpExporter(options =>
-                {
-                    options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
-                    options.Protocol = OtlpExportProtocol.HttpProtobuf;
-                    options.Headers = $"X-Seq-ApiKey={seqApiKey}";
-                });
-            }
+            //if (!string.IsNullOrWhiteSpace(seqServerUrl))
+            //{
+            //    logging.AddOtlpExporter(options =>
+            //    {
+            //        options.Endpoint = new Uri($"{seqServerUrl}/ingest/otlp/v1/logs");
+            //        options.Protocol = OtlpExportProtocol.HttpProtobuf;
+            //        options.Headers = $"X-Seq-ApiKey={seqApiKey}";
+            //    });
+            //}
         });
 
         // Tracing
@@ -94,8 +93,10 @@ public static class ConfigureTelemetry
                 // We want to capture custom traces from our application
                 tracing.AddSource(DiagnosticsConfig.ServiceName);
 
+                tracing.AddSource(Edgamat.Messaging.DiagnosticsConfig.ServiceName);
+
                 // We want to capture traces from MassTransit
-                tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
+                // tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
 
                 tracing.AddAspNetCoreInstrumentation()
                     .AddSqlClientInstrumentation(options =>

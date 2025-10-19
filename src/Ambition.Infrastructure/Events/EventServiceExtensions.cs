@@ -1,9 +1,9 @@
-﻿using System.Reflection;
-
-using Ambition.Domain;
+﻿using Ambition.Domain;
 using Ambition.Infrastructure.Events;
 
-using MassTransit;
+using Edgamat.Messaging.Configuration;
+
+using Microsoft.Extensions.Configuration;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 namespace Microsoft.Extensions.DependencyInjection;
@@ -11,29 +11,14 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class EventServiceExtensions
 {
-    public static IServiceCollection AddMessaging(this IServiceCollection services)
+    public static IServiceCollection AddMessaging(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IEventPublisher, EventPublisher>();
 
-        services.AddMassTransit(x =>
-        {
-            x.SetKebabCaseEndpointNameFormatter();
-
-            var entryAssembly = Assembly.GetEntryAssembly();
-
-            x.AddConsumers(entryAssembly);
-
-            x.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host("localhost", "/", h =>
-                {
-                    h.Username("guest");
-                    h.Password("guest");
-                });
-
-                cfg.ConfigureEndpoints(context);
-            });
-        });
+        services.AddAzureServiceBus()
+            .WithConfiguration(configuration)
+            .AddPublisher()
+            .Build();
 
         return services;
     }
