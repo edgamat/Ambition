@@ -43,7 +43,7 @@ public static class ConfigureTelemetry
                 resourceBuilder.AddTelemetrySdk();
                 resourceBuilder.AddServiceAttributes(builder.Environment);
             })
-            .UseOtlpExporter();
+        .UseOtlpExporter();
         // .UseOtlpExporter(OtlpExportProtocol.HttpProtobuf, new Uri("http://localhost:5341/ingest/otlp"));
 
         // Logging
@@ -53,7 +53,7 @@ public static class ConfigureTelemetry
             logging.IncludeScopes = true;
 
             // We want to add some default attributes to all our logs
-            logging.AddProcessor(new AddAttributesProcessor(defaultAttributes));
+            // logging.AddProcessor(new AddAttributesProcessor(defaultAttributes));
 
             if (builder.Environment.IsDevelopment())
             {
@@ -93,8 +93,10 @@ public static class ConfigureTelemetry
                 // We want to capture custom traces from our application
                 tracing.AddSource(DiagnosticsConfig.ServiceName);
 
+                tracing.AddSource(Edgamat.Messaging.DiagnosticsConfig.ServiceName);
+
                 // We want to capture traces from MassTransit
-                tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
+                // tracing.AddSource(MassTransit.Logging.DiagnosticHeaders.DefaultListenerName);
 
                 tracing.AddAspNetCoreInstrumentation()
                     .AddSqlClientInstrumentation(options =>

@@ -3,44 +3,44 @@
 using Ambition.Accounting.Events;
 using Ambition.Domain;
 
-using MassTransit;
+using Edgamat.Messaging;
 
 namespace Ambition.Accounting.Messages;
 
-public class MaintenancePlanCreatedConsumer : IConsumer<MaintenancePlanCreated>
+public class MaintenancePlanCreatedConsumer : JsonConsumer<MaintenancePlanCreated>
 {
     private readonly ILogger<MaintenancePlanCreatedConsumer> _logger;
     private readonly IEventHandler<MaintenancePlanCreatedEvent> _eventHandler;
 
     public MaintenancePlanCreatedConsumer(
         ILogger<MaintenancePlanCreatedConsumer> logger,
-        IEventHandler<MaintenancePlanCreatedEvent> eventHandler)
+        IEventHandler<MaintenancePlanCreatedEvent> eventHandler) : base(logger)
     {
         _logger = logger;
         _eventHandler = eventHandler;
     }
 
-    public async Task Consume(ConsumeContext<MaintenancePlanCreated> context)
+    public async override Task ConsumeMessageAsync(MaintenancePlanCreated message, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Received MaintenancePlanCreated message for maintenance plan: {Id}", context.Message.Id);
+        _logger.LogInformation("Received MaintenancePlanCreated message for maintenance plan: {Id}", message.Id);
 
-        Activity.Current?.EnrichWithMaintenancePlan(context.Message);
+        Activity.Current?.EnrichWithMaintenancePlan(message);
 
         try
         {
             await _eventHandler.HandleAsync(new MaintenancePlanCreatedEvent
             {
-                Id = context.Message.Id,
-                ProductId = context.Message.ProductId,
-                CustomerId = context.Message.CustomerId,
-                CreatedBy = context.Message.CreatedBy,
-                CreatedAt = context.Message.CreatedAt
-            }, context.CancellationToken);
+                Id = message.Id,
+                ProductId = message.ProductId,
+                CustomerId = message.CustomerId,
+                CreatedBy = message.CreatedBy,
+                CreatedAt = message.CreatedAt
+            }, cancellationToken);
         }
         catch (Exception ex)
         {
             Activity.Current?.SetStatus(ActivityStatusCode.Error);
-            _logger.LogError(ex, "Failed to handle MaintenancePlanCreated message for maintenance plan: {PlanId}", context.Message.Id);
+            _logger.LogError(ex, "Failed to handle MaintenancePlanCreated message for maintenance plan: {PlanId}", message.Id);
         }
     }
 }

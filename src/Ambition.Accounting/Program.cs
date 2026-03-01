@@ -20,7 +20,7 @@ builder.Services.AddSingleton(p => AccountingDbContextDesignTimeDbContextFactory
 
 builder.Services.AddScoped(p => new AccountingDbContext(p.GetRequiredService<DbContextOptions<AccountingDbContext>>()));
 
-builder.Services.AddMessaging();
+builder.Services.AddMessaging(builder.Configuration);
 
 builder.Services.AddScoped<IEventHandler<MaintenancePlanCreatedEvent>, MaintenancePlanCreatedHandler>();
 

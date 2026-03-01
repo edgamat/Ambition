@@ -39,7 +39,7 @@ public class MaintenancePlanService : IMaintenancePlanService
             maintenancePlan.CreatedBy,
             maintenancePlan.CreatedAt);
 
-        await _eventPublisher.PublishAsync(maintenancePlanCreated, "maintenance-plan-created");
+        await _eventPublisher.PublishAsync(maintenancePlanCreated, "queue.1");
 
         return maintenancePlan.Id;
     }
