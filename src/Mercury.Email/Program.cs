@@ -15,8 +15,6 @@ app.MapPost("/send", async (ILogger<Program> logger) =>
     logger.LogInformation("Email sent");
 
     return Results.Ok();
-})
-.WithName("Send")
-.WithOpenApi();
+});
 
 app.Run();

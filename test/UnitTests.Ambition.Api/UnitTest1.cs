@@ -26,6 +26,6 @@ public class UnitTest1
 
         Assert.NotNull(activity);
 
-        Assert.Null(activity.Id);
+        Assert.NotNull(activity.Id);
     }
 }

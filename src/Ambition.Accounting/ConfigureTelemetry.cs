@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Data.Common;
+using System.Diagnostics;
 using System.Reflection;
 
 using Microsoft.Data.SqlClient;
@@ -98,8 +99,7 @@ public static class ConfigureTelemetry
                 tracing.AddHttpClientInstrumentation()
                     .AddSqlClientInstrumentation(options =>
                     {
-                        options.SetDbStatementForText = builder.Environment.IsDevelopment();
-                        options.Enrich = (activity, name, cmd) =>
+                        options.EnrichWithSqlCommand = (activity, cmd) =>
                         {
                             if (cmd is SqlCommand sqlCommand)
                                 activity.SetTag("db.parameter-count", sqlCommand.Parameters.Count);
