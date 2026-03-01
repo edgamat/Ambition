@@ -17,9 +17,7 @@ public static class MaintenancePlanEndpoints
             return plan is null
                 ? Results.NotFound()
                 : Results.Ok(plan);
-        })
-        .WithName("Get")
-        .WithOpenApi();
+        });
 
         endpoints.MapPost("/maintenance-plan", async ([FromBody] CreatePlanModel model, IMaintenancePlanService maintenancePlanService) =>
         {
@@ -37,8 +35,6 @@ public static class MaintenancePlanEndpoints
             await maintenancePlanService.CreateAsync(plan);
 
             return Results.Created($"/maintenance-plan/{plan.Id}", plan);
-        })
-        .WithName("Create")
-        .WithOpenApi();
+        });
     }
 }

@@ -38,4 +38,3 @@ internal class AccountingDbContextDesignTimeDbContextFactory : IDesignTimeDbCont
         return contextOptions.Options;
     }
 }
-

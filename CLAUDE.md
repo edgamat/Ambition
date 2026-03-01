@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Project Ambition is a .NET 9.0 example application demonstrating OpenTelemetry distributed tracing. It consists of multiple services communicating via RabbitMQ/MassTransit with SQL Server persistence.
+Project Ambition is a .NET 10.0 example application demonstrating OpenTelemetry distributed tracing. It consists of multiple services communicating via RabbitMQ/MassTransit with SQL Server persistence.
 
 ## Build & Test Commands
 
@@ -35,7 +35,7 @@ dotnet test --filter "FullyQualifiedName~TestMethodName"
 - **Ambition.Infrastructure** — EF Core `AmbitionDbContext` (SQL Server), repository implementations, event publishing via Edgamat.Messaging, and EF migrations.
 - **Ambition.Api** — ASP.NET Core Minimal API. Endpoints for maintenance plans (GET/POST). Configures OpenTelemetry (OTLP exporters), Serilog logging, health checks, and Swagger.
 - **Ambition.Accounting** — Background worker service (hosted service). Consumes `MaintenancePlanCreated` events via MassTransit/RabbitMQ. Has its own `AccountingDbContext` for ledger data.
-- **Mercury.Email** — Stub email service (Minimal API, .NET 8.0). POST `/send` endpoint with simulated delay.
+- **Mercury.Email** — Stub email service (Minimal API, .NET 10.0). POST `/send` endpoint with simulated delay.
 
 ## Key Patterns
 

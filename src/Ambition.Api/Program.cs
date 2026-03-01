@@ -35,4 +35,3 @@ app.UseTraceParent();
 app.MapMaintenancePlanEndpoints();
 
 app.Run();
-

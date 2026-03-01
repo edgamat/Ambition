@@ -101,8 +101,7 @@ public static class ConfigureTelemetry
                 tracing.AddAspNetCoreInstrumentation()
                     .AddSqlClientInstrumentation(options =>
                     {
-                        options.SetDbStatementForText = builder.Environment.IsDevelopment();
-                        options.Enrich = (activity, name, cmd) =>
+                        options.EnrichWithSqlCommand = (activity, cmd) =>
                         {
                             if (cmd is SqlCommand sqlCommand)
                                 activity.SetTag("db.parameter-count", sqlCommand.Parameters.Count);

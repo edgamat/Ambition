@@ -41,4 +41,3 @@ internal class AmbitionDbContextDesignTimeDbContextFactory : IDesignTimeDbContex
         return contextOptions.Options;
     }
 }
-
